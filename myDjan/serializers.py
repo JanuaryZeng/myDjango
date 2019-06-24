@@ -7,5 +7,5 @@ class lovertableSerializer(serializers.ModelSerializer):
         # 对应类名
         model = lovertable
         # 各个字段，其中_id是默认id字段
-        fields = ('id', 'loverid', 'lovernumber','loverpassword','loverdate','moneyout','moneyin')
+        fields = ('loverid', 'lovernumber','loverpassword','loverdate','moneyout','moneyin')
 

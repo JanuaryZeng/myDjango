@@ -100,4 +100,31 @@ def another_user_api(request, userid):
         user.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+@api_view(['POST'])
+def android_user_api(request):
+    if request.method == 'POST':
+        _data = dict(request.data)
+        # 之前说过request.data是一个字典，可以利用这个
+        #fields = ('loverid', 'lovernumber','loverpassword','loverdate','moneyout','moneyin')
 
+        if _data['method'][0] == '_GET':
+            user = lovertable.objects.get(loverid=_data['loverid'][0], lovernumber=_data['lovernumber'][0], loverdate=_data['loverdate'][0], moneyout=_data['moneyout'][0], moneyin=_data['moneyin'][0])
+            serializer = lovertableSerializer(user)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        elif _data['method'][0] == '_POST':
+            # request.data 中多余的数据不会保存到数据库中
+            serializer = lovertableSerializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        elif _data['method'][0] == '_PUT':
+            user = lovertable.objects.get(loverid=_data['loverid'][0])
+            serializer = lovertableSerializer(user, data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        elif _data['method'][0] == '_DELETE':
+            lovertable.objects.get(loverid=_data['loverid'][0]).delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
