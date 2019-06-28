@@ -34,6 +34,18 @@ class moneychangetable(models.Model):
         db_table = "moneychangetable"
 
 
+class notetable(models.Model):
+    noteid  = models.AutoField(primary_key=True)
+    loverid = models.ForeignKey(lovertable,on_delete=models.CASCADE,db_column="loverid")
+    moneytypeid = models.ForeignKey(moneytypetable,on_delete=models.CASCADE,db_column="moneytypeid")
+    notedate = models.CharField(max_length=255, null=False)
+    notetext = models.CharField(max_length=255, null=False)
+    notestatus = models.CharField(max_length=255, null=False)#用来判断是消费还是代办的，还有完成的
+
+    class Meta:
+        db_table = "notetable"
+
+
 
 
 

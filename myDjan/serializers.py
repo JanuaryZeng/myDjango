@@ -1,8 +1,7 @@
-from .models import lovertable, moneytypetable, moneychangetable
+from .models import lovertable, moneytypetable, moneychangetable,notetable
 from rest_framework import serializers
 
 class moneychangetableSerializer(serializers.ModelSerializer):
-    serializers.CharField(source='FK.字段')
     class Meta:
         # 对应类名
         model = moneychangetable
@@ -24,6 +23,12 @@ class moneytypetableSerializer(serializers.ModelSerializer):
     class Meta:
         model = moneytypetable
         # fields = ('moneytypeid', 'moneytypeicon','moneydirction')
+        fields = "__all__"
+
+class notetableSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = notetable
+        # fields = ('noteid', 'loverid','moneytypeid','notedate','notetext','notestatus')
         fields = "__all__"
 # try:
 #     mon_change_obj = moneychangetable.objects.get(loverid_id=data['loverid'])

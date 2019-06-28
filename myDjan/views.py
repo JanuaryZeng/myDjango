@@ -6,8 +6,8 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .models import lovertable
 from .serializers import lovertableSerializer
-from .models import moneychangetable, moneytypetable
-from .serializers import moneychangetableSerializer, moneytypetableSerializer
+from .models import moneychangetable, moneytypetable,notetable
+from .serializers import moneychangetableSerializer, moneytypetableSerializer,notetableSerializer
 
 
 # 规定该方法只能通过post、get和delete请求
@@ -132,6 +132,18 @@ def android_user_api(request):
             elif _data['method'][0] == '_DELETE':
                 lovertable.objects.get(loverid=_data['loverid'][0]).delete()
                 return Response(status=status.HTTP_204_NO_CONTENT)
+            elif _data['method'][0] == '_Money':
+                if _data['Mate'][0] == '_GET':
+                    user = lovertable.objects.get(loverid=_data['loverid'][0])
+                    serializer = lovertableSerializer(user)
+                    return Response(serializer.data, status=status.HTTP_200_OK)
+                elif _data['Mate'][0] == '_PUT':
+                    # request.data 中多余的数据不会保存到数据库中
+                    serializer = lovertableSerializer(data=request.data)
+                    if serializer.is_valid():
+                        serializer.save()
+                        return Response(serializer.data, status=status.HTTP_201_CREATED)
+                    return Response(status=status.HTTP_400_BAD_REQUEST)
 
         # moneychangetable
         elif _data['table'][0] == 'moneychangetable':
@@ -152,14 +164,14 @@ def android_user_api(request):
                     return Response(serializer.data, status=status.HTTP_201_CREATED)
                 return Response(status=status.HTTP_400_BAD_REQUEST)
             elif _data['method'][0] == '_PUT':
-                user = moneychangetable.objects.get(loverid=_data['loverid'][0])
+                user = moneychangetable.objects.get(moneychangeid=_data['moneychangeid'][0])
                 serializer = moneychangetableSerializer(user, data=request.data)
                 if serializer.is_valid():
                     serializer.save()
                     return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
                 return Response(status=status.HTTP_400_BAD_REQUEST)
             elif _data['method'][0] == '_DELETE':
-                moneychangetable.objects.get(loverid=_data['loverid'][0]).delete()
+                moneychangetable.objects.get(moneychangeid=_data['moneychangeid'][0],loverid=_data['loverid'][0]).delete()
                 return Response(status=status.HTTP_204_NO_CONTENT)
 
         elif _data['table'][0] == 'moneytypetable':
@@ -171,8 +183,31 @@ def android_user_api(request):
                     return Response('参数不存在')
                 ser = moneytypetableSerializer(instance=mon_change_obj, many=True)
                 return Response(ser.data, status=status.HTTP_200_OK)
-
-
+        elif _data['table'][0] == 'notetable':
+            if _data['method'][0] == '_GET':
+                try:
+                    mon_change_obj = notetable.objects.filter(loverid=_data['loverid'][0])
+                except notetable.DoesNotExist:
+                    return Response('参数不存在')
+                ser = notetableSerializer(instance=mon_change_obj, many=True)
+                return Response(ser.data, status=status.HTTP_200_OK)
+            elif _data['method'][0] == '_POST':
+                # request.data 中多余的数据不会保存到数据库中
+                serializer = notetableSerializer(data=request.data)
+                if serializer.is_valid():
+                    serializer.save()
+                    return Response(serializer.data, status=status.HTTP_201_CREATED)
+                return Response(status=status.HTTP_400_BAD_REQUEST)
+            elif _data['method'][0] == '_PUT':
+                user = notetable.objects.get(noteid=_data['noteid'][0])
+                serializer = notetableSerializer(user, data=request.data)
+                if serializer.is_valid():
+                    serializer.save()
+                    return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+                return Response(status=status.HTTP_400_BAD_REQUEST)
+            elif _data['method'][0] == '_DELETE':
+                notetable.objects.get(noteid=_data['noteid'][0]).delete()
+                return Response(status=status.HTTP_204_NO_CONTENT)
 
         # if _data['method'][0] == '_GET':
         #     user = lovertable.objects.get(loverid=_data['loverid'][0])
