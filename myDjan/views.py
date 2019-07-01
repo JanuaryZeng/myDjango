@@ -257,7 +257,6 @@ def uploadImages(request):
     if True:
 
         url_sets = list()
-
         len = int(request.POST.get('len'))
 
         loverid = request.POST.get('loverid')
@@ -371,6 +370,8 @@ def upLoadIcon(request):
     usergender = request.POST.get('usergender')
     username = request.POST.get('username')
     userborn = request.POST.get('userborn')
+    loverid = request.POST.get('loverid')
+
 
 
     _data = dict()
@@ -378,25 +379,25 @@ def upLoadIcon(request):
     _data.update({'usergender': usergender})
     _data.update({'username': username})
     _data.update({'userborn': userborn})
-    print("**********----------------************")
+    _data.update({'loverid': loverid})
+
+    print("**********----------------************",request.FILES)
 
     sourcefiles = request.FILES['icon']
-    print("**********----------------************")
-
     if sourcefiles.content_type == 'application/octet-stream' or sourcefiles.content_type == 'image/jpeg' or sourcefiles.content_type == 'application/x-jpg' or sourcefiles.content_type == 'image/png' or sourcefiles.content_type == 'application/x-png' or sourcefiles.content_type == 'text/plain':
         file_path, path = save_uploaded_file(sourcefiles)
-        _data.update('usericon',path)
-    a = {'data',_data}
+        _data.update({'usericon':path})
+    user = usertable.objects.get(userid=_data['userid'][0])
+    serializer = usertableSerializer(user,data = _data)
+    if serializer.is_valid():
 
-    user = usertableSerializer(data = _data)
-    if user.is_valid():
-        user.save()
-        return HttpResponse(a, 'application/javascript')
+        serializer.save()
+        return HttpResponse("ok", 'application/javascript')
     else:
-        ErrorDict = user.errors
+        ErrorDict = serializer.errors
 
         Error_Str = json.dumps(ErrorDict)
 
         Error_Dict = json.loads(Error_Str)
         print(Error_Dict)
-    return HttpResponse(a, 'application/javascript')
+    return HttpResponse("ok", 'application/javascript')
