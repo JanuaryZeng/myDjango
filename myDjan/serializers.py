@@ -1,4 +1,4 @@
-from .models import lovertable, moneytypetable, moneychangetable,notetable
+from .models import lovertable, moneytypetable, moneychangetable,notetable,friendtable,usertable
 from rest_framework import serializers
 
 class moneychangetableSerializer(serializers.ModelSerializer):
@@ -29,6 +29,17 @@ class notetableSerializer(serializers.ModelSerializer):
     class Meta:
         model = notetable
         # fields = ('noteid', 'loverid','moneytypeid','notedate','notetext','notestatus')
+        fields = "__all__"
+
+class usertableSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = usertable
+        # userid loverid usergender username usericon userborn
+        fields = "__all__"
+class friendtableSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = friendtable
+        # friendid loverid usergender frienddate friendphotos friendtext
         fields = "__all__"
 # try:
 #     mon_change_obj = moneychangetable.objects.get(loverid_id=data['loverid'])

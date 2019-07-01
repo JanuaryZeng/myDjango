@@ -1,13 +1,21 @@
+import datetime
+
+import os
+import simplejson as simplejson
+from django.http import HttpResponse
 from django.shortcuts import render
 
 # Create your views here.
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rest_framework.utils import json
+
+from myDjango.settings import BASE_DIR
 from .models import lovertable
 from .serializers import lovertableSerializer
-from .models import moneychangetable, moneytypetable,notetable
-from .serializers import moneychangetableSerializer, moneytypetableSerializer,notetableSerializer
+from .models import moneychangetable, moneytypetable,notetable,usertable,friendtable
+from .serializers import moneychangetableSerializer, moneytypetableSerializer,notetableSerializer,usertableSerializer,friendtableSerializer
 
 
 # 规定该方法只能通过post、get和delete请求
@@ -137,13 +145,6 @@ def android_user_api(request):
                     user = lovertable.objects.get(loverid=_data['loverid'][0])
                     serializer = lovertableSerializer(user)
                     return Response(serializer.data, status=status.HTTP_200_OK)
-                elif _data['Mate'][0] == '_PUT':
-                    # request.data 中多余的数据不会保存到数据库中
-                    serializer = lovertableSerializer(data=request.data)
-                    if serializer.is_valid():
-                        serializer.save()
-                        return Response(serializer.data, status=status.HTTP_201_CREATED)
-                    return Response(status=status.HTTP_400_BAD_REQUEST)
 
         # moneychangetable
         elif _data['table'][0] == 'moneychangetable':
@@ -208,6 +209,25 @@ def android_user_api(request):
             elif _data['method'][0] == '_DELETE':
                 notetable.objects.get(noteid=_data['noteid'][0]).delete()
                 return Response(status=status.HTTP_204_NO_CONTENT)
+        elif _data['table'][0] == 'usertable':
+            if _data['method'][0] == '_GET':
+                try:
+                    mon_change_obj = usertable.objects.filter(loverid=_data['loverid'][0])
+                except notetable.DoesNotExist:
+                    return Response('参数不存在')
+                ser = usertableSerializer(instance=mon_change_obj, many=True)
+                return Response(ser.data, status=status.HTTP_200_OK)
+        elif _data['table'][0] == 'friendtable':
+            if _data['method'][0] == '_GET':
+                try:
+                    mon_change_obj = friendtable.objects.filter(loverid=_data['loverid'][0])
+                except notetable.DoesNotExist:
+                    return Response('参数不存在')
+                ser = friendtableSerializer(instance=mon_change_obj, many=True)
+                return Response(ser.data, status=status.HTTP_200_OK)
+            elif _data['method'][0] == '_DELETE':
+                friendtable.objects.get(friendid=_data['friendid'][0]).delete()
+                return Response(status=status.HTTP_204_NO_CONTENT)
 
         # if _data['method'][0] == '_GET':
         #     user = lovertable.objects.get(loverid=_data['loverid'][0])
@@ -230,3 +250,153 @@ def android_user_api(request):
         # elif _data['method'][0] == '_DELETE':
         #     lovertable.objects.get(loverid=_data['loverid'][0]).delete()
         #     return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+def uploadImages(request):
+    print(request)
+    if True:
+
+        url_sets = list()
+
+        len = int(request.POST.get('len'))
+
+        loverid = request.POST.get('loverid')
+        usergender = request.POST.get('usergender')
+        frienddate = request.POST.get('frienddate')
+        friendtext = request.POST.get('friendtext')
+
+        _data = dict()
+        _data.update({'loverid':loverid})
+        _data.update({'usergender':usergender})
+        _data.update({'frienddate':frienddate})
+        _data.update({'friendtext':friendtext})
+
+        # print("*-*-*-*-*-*-*-/*-/*-/*-/-*/*-",friendtext)
+
+        source1 = ['sourcefiles0','sourcefiles1']
+        source2 = ['sourcefiles2','sourcefiles3']
+        source3 = ['sourcefiles4','sourcefiles5']
+        source4 = ['sourcefiles6','sourcefiles7','sourcefiles8']
+
+        url_sets.clear()
+        for i in source1:
+            if len <= 0:
+                break
+            len = len - 1
+            sourcefiles = request.FILES[i]
+            if sourcefiles.content_type == 'application/octet-stream' or sourcefiles.content_type == 'image/jpeg' or sourcefiles.content_type == 'application/x-jpg' or sourcefiles.content_type == 'image/png' or sourcefiles.content_type == 'application/x-png' or sourcefiles.content_type == 'text/plain':
+                file_path, path = save_uploaded_file(sourcefiles)
+                url_sets.append(path)
+            pathur = '去'.join(url_sets)
+            print("------********-----", pathur)
+            _data.update({'friendphotos1': pathur})
+
+        url_sets.clear()
+        for i in source2:
+            if len <= 0:
+                break
+            len = len - 1
+
+            sourcefiles = request.FILES[i]
+            if sourcefiles.content_type == 'application/octet-stream' or sourcefiles.content_type == 'image/jpeg' or sourcefiles.content_type == 'application/x-jpg' or sourcefiles.content_type == 'image/png' or sourcefiles.content_type == 'application/x-png' or sourcefiles.content_type == 'text/plain':
+                file_path, path = save_uploaded_file(sourcefiles)
+                url_sets.append(path)
+            pathur = '去'.join(url_sets)
+            print("------********-----", pathur)
+            _data.update({'friendphotos2': pathur})
+
+        url_sets.clear()
+        for i in source3:
+            if len <= 0:
+                break
+            len = len - 1
+
+            sourcefiles = request.FILES[i]
+            if sourcefiles.content_type == 'application/octet-stream' or sourcefiles.content_type == 'image/jpeg' or sourcefiles.content_type == 'application/x-jpg' or sourcefiles.content_type == 'image/png' or sourcefiles.content_type == 'application/x-png' or sourcefiles.content_type == 'text/plain':
+                file_path, path = save_uploaded_file(sourcefiles)
+                url_sets.append(path)
+            pathur = '去'.join(url_sets)
+            print("------********-----", pathur)
+            _data.update({'friendphotos3': pathur})
+
+        url_sets.clear()
+        for i in source4:
+            if len <= 0:
+                break
+            len = len - 1
+
+            sourcefiles = request.FILES[i]
+            if sourcefiles.content_type == 'application/octet-stream' or sourcefiles.content_type == 'image/jpeg' or sourcefiles.content_type == 'application/x-jpg' or sourcefiles.content_type == 'image/png' or sourcefiles.content_type == 'application/x-png' or sourcefiles.content_type == 'text/plain':
+                file_path, path = save_uploaded_file(sourcefiles)
+                url_sets.append(path)
+            pathur = '去'.join(url_sets)
+            print("------********-----", pathur)
+            _data.update({'friendphotos4': pathur})
+
+
+        friend = friendtableSerializer(data=_data)
+        a = {'data': _data}
+
+        if friend.is_valid():
+            friend.save()
+            return HttpResponse(a, 'application/javascript')
+            # 取出验证失败的信息,方便定位问题,给用用户提示
+        else:
+            ErrorDict = friend.errors
+
+            Error_Str = json.dumps(ErrorDict)
+
+            Error_Dict = json.loads(Error_Str)
+            print(Error_Dict)
+        return HttpResponse(a, 'application/javascript')
+
+def save_uploaded_file(sourcefiles):#将图片储存下来
+    filename = sourcefiles.name
+    filePath = os.path.join(BASE_DIR, 'media').replace('\\', '/') + '/'+ filename
+    path = os.path.join("http://10.0.116.45:8000/media/",filename)
+    destination = open(filePath, 'wb+')
+    try:
+        for chunk in sourcefiles.chunks():
+            destination.write(chunk)
+    except Exception as e:
+        print ("save_uploaded_file----%s : %s" % (Exception, e))
+    finally:
+        destination.close()
+    return filePath,path
+
+def upLoadIcon(request):
+    print("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++",request)
+
+    userid = request.POST.get('userid')
+    usergender = request.POST.get('usergender')
+    username = request.POST.get('username')
+    userborn = request.POST.get('userborn')
+
+
+    _data = dict()
+    _data.update({'userid': userid})
+    _data.update({'usergender': usergender})
+    _data.update({'username': username})
+    _data.update({'userborn': userborn})
+    print("**********----------------************")
+
+    sourcefiles = request.FILES['icon']
+    print("**********----------------************")
+
+    if sourcefiles.content_type == 'application/octet-stream' or sourcefiles.content_type == 'image/jpeg' or sourcefiles.content_type == 'application/x-jpg' or sourcefiles.content_type == 'image/png' or sourcefiles.content_type == 'application/x-png' or sourcefiles.content_type == 'text/plain':
+        file_path, path = save_uploaded_file(sourcefiles)
+        _data.update('usericon',path)
+    a = {'data',_data}
+
+    user = usertableSerializer(data = _data)
+    if user.is_valid():
+        user.save()
+        return HttpResponse(a, 'application/javascript')
+    else:
+        ErrorDict = user.errors
+
+        Error_Str = json.dumps(ErrorDict)
+
+        Error_Dict = json.loads(Error_Str)
+        print(Error_Dict)
+    return HttpResponse(a, 'application/javascript')

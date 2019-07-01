@@ -45,9 +45,32 @@ class notetable(models.Model):
     class Meta:
         db_table = "notetable"
 
+class usertable(models.Model):
+
+    userid = models.AutoField(primary_key=True)
+    loverid = models.ForeignKey(lovertable,on_delete=models.CASCADE,db_column="loverid")
+    usergender = models.CharField(max_length=10,default="man")
+    username = models.CharField(max_length=255,default="user")
+    usericon = models.CharField(max_length=255,null=True)
+    userborn = models.CharField(max_length=255,null=True)
+
+    class Meta:
+        db_table = "usertable"
 
 
+class friendtable(models.Model):
 
+    friendid = models.AutoField(primary_key=True)
+    loverid = models.ForeignKey(lovertable,on_delete=models.CASCADE,db_column="loverid")
+    usergender = models.CharField(max_length=10,default="man")
+    frienddate = models.CharField(max_length=255, null=False)
+    friendphotos1 = models.CharField(max_length=255, null=True)
+    friendphotos2 = models.CharField(max_length=255, null=True)
+    friendphotos3 = models.CharField(max_length=255, null=True)
+    friendphotos4 = models.CharField(max_length=255, null=True)
+    friendtext = models.CharField(max_length=255, null=True)
 
+    class Meta:
+        db_table = "friendtable"
 
 
