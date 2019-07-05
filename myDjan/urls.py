@@ -17,4 +17,5 @@ urlpatterns = [
     url(r'^android_user/$', views.android_user_api),
     url(r'^uploading/$', views.uploadImages),
     url(r'^uploadicon/$', views.upLoadIcon)
+
 ]+ static(MEDIA_URL, document_root=MEDIA_ROOT)

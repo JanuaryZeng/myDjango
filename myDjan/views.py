@@ -217,6 +217,21 @@ def android_user_api(request):
                     return Response('参数不存在')
                 ser = usertableSerializer(instance=mon_change_obj, many=True)
                 return Response(ser.data, status=status.HTTP_200_OK)
+            elif _data['method'][0] == '_PUT':
+                user = usertable.objects.get(loverid=_data['loverid'][0],usergender=_data['usergender'][0])
+                serializer = usertableSerializer(user, data=request.data)
+                if serializer.is_valid():
+                    serializer.save()
+                    return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+                return Response(status=status.HTTP_400_BAD_REQUEST)
+            elif _data['method'][0] == '_POST':
+                # request.data 中多余的数据不会保存到数据库中
+                print("-------------------------",request.data)
+                serializer = usertableSerializer(data=request.data)
+                if serializer.is_valid():
+                    serializer.save()
+                    return Response(serializer.data, status=status.HTTP_201_CREATED)
+                return Response(status=status.HTTP_400_BAD_REQUEST)
         elif _data['table'][0] == 'friendtable':
             if _data['method'][0] == '_GET':
                 try:
@@ -352,7 +367,7 @@ def uploadImages(request):
 def save_uploaded_file(sourcefiles):#将图片储存下来
     filename = sourcefiles.name
     filePath = os.path.join(BASE_DIR, 'media').replace('\\', '/') + '/'+ filename
-    path = os.path.join("http://10.0.116.45:8000/media/",filename)
+    path = os.path.join("http://192.168.43.71:8000/media/",filename)
     destination = open(filePath, 'wb+')
     try:
         for chunk in sourcefiles.chunks():
@@ -364,7 +379,6 @@ def save_uploaded_file(sourcefiles):#将图片储存下来
     return filePath,path
 
 def upLoadIcon(request):
-    print("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++",request)
 
     userid = request.POST.get('userid')
     usergender = request.POST.get('usergender')
@@ -372,16 +386,12 @@ def upLoadIcon(request):
     userborn = request.POST.get('userborn')
     loverid = request.POST.get('loverid')
 
-
-
     _data = dict()
     _data.update({'userid': userid})
     _data.update({'usergender': usergender})
     _data.update({'username': username})
     _data.update({'userborn': userborn})
     _data.update({'loverid': loverid})
-
-    print("**********----------------************",request.FILES)
 
     sourcefiles = request.FILES['icon']
     if sourcefiles.content_type == 'application/octet-stream' or sourcefiles.content_type == 'image/jpeg' or sourcefiles.content_type == 'application/x-jpg' or sourcefiles.content_type == 'image/png' or sourcefiles.content_type == 'application/x-png' or sourcefiles.content_type == 'text/plain':
